@@ -1,0 +1,43 @@
+const int trigPin = 9;
+const int echoPin = 10;
+const int ledPin = 5;
+
+const int detectionDistance = 80;
+const unsigned long lightDuration = 20000;
+
+unsigned long lastDetected = 0;
+bool lightOn = false;
+
+void setup() {
+  pinMode(trigPin, OUTPUT);
+  pinMode(echoPin, INPUT);
+  pinMode(ledPin, OUTPUT);
+
+  digitalWrite(ledPin, LOW);
+  Serial.begin(9600);
+}
+
+void loop() {
+  digitalWrite(trigPin, LOW);
+  delayMicroseconds(2);
+
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPin, LOW);
+
+  long duration = pulseIn(echoPin, HIGH, 30000);
+  int distance = duration * 0.034 / 2;
+
+  if (duration > 0 && distance > 0 && distance < detectionDistance) {
+    lastDetected = millis();
+    lightOn = true;
+  }
+
+  if (millis() - lastDetected > lightDuration) {
+    lightOn = false;
+  }
+
+  digitalWrite(ledPin, lightOn ? HIGH : LOW);
+
+  delay(100);
+}
